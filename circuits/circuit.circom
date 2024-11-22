@@ -3,6 +3,15 @@ include "./merkletree.circom";
 include "../node_modules/circomlib/circuits/eddsaposeidon.circom";
 include "../node_modules/circomlib/circuits/poseidon.circom";
 
+template AssertDistinct(n) {
+  signal input in[n];
+
+  for (var i = 0; i < n-1; i++){
+    for (var j = i+1; j < n; j++){
+       assert(in[i] != in[j]);
+    }
+  }
+}
 
 
 // Aggregate signatures and verify the signers public key are is in the merkle root
@@ -49,6 +58,12 @@ template AggregateCheckWitnessSignatures(levels,confirmations){
     component witnessAddrPoseidon[confirmations];
     component tree[confirmations];
     component eddsa[confirmations];
+
+    component assertDistinct = AssertDistinct(confirmations);
+
+    for(var i = 0; i < confirmations;i++){
+        assertDistinct.in[i] <== witnessAddresses[i];
+    }
 
     // Inside the forloop check if the valid signature's address is in the merkle tree
     for(var i = 0; i < confirmations; i++){
