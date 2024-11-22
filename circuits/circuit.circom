@@ -34,17 +34,16 @@ template AggregateCheckWitnessSignatures(levels,confirmations){
     signal input pathElements[confirmations][levels]; // The merkle proof which is fixed size, pathElements contains the hashes
     signal input pathIndices[confirmations][levels]; // Indices encode if we hash left or right
     
-    component poseidon = Poseidon(7);
+    component messageHasher = Poseidon(7);
     
-    poseidon.inputs[0] <== msgslots[0];
-    poseidon.inputs[1] <== msgslots[1];
-    poseidon.inputs[2] <== msgslots[2];
-    poseidon.inputs[3] <== msgslots[3];
+    messageHasher.inputs[0] <== msgslots[0];
+    messageHasher.inputs[1] <== msgslots[1];
+    messageHasher.inputs[2] <== msgslots[2];
+    messageHasher.inputs[3] <== msgslots[3];
 
-    // Verifies the origin and destination contract is in the signature
-    poseidon.inputs[4] <== origin;
-    poseidon.inputs[5] <== destination;
-    poseidon.inputs[6] <== nonce;
+    messageHasher.inputs[4] <== origin;
+    messageHasher.inputs[5] <== destination;
+    messageHasher.inputs[6] <== nonce;
 
 
     component witnessAddrPoseidon[confirmations];
@@ -77,7 +76,7 @@ template AggregateCheckWitnessSignatures(levels,confirmations){
          eddsa[i].S <== S[i];
          eddsa[i].R8x <== R8x[i];
          eddsa[i].R8y <== R8y[i];
-         eddsa[i].M <== poseidon.out;
+         eddsa[i].M <== messageHasher.out;
 
 
     }
